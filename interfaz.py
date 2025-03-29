@@ -6,8 +6,8 @@ import os
 import threading
 import json
 
-VERSION = "v0.3"
-OUTPUT_FOLDER_PATH = "output"
+VERSION = "v0.4.0"
+output_folder_path = "output"
 
 valores = {
     "val1": 0,
@@ -15,6 +15,7 @@ valores = {
     "val3": 0,
     "val4": 0,
     "val5": 0,
+    "val6": "",
 }
 
 def leer_valores_json():
@@ -48,7 +49,7 @@ def iniciar_proceso():
         prev = True
 
     # Ejecutar la función principal en un hilo separado
-    thread = threading.Thread(target=main, args=(ruta, OUTPUT_FOLDER_PATH, valores, log_text, prev,))
+    thread = threading.Thread(target=main, args=(ruta, valores["val6"], valores, log_text, prev,))
     thread.start()
 
 # Función de previsualización
@@ -86,6 +87,7 @@ def abrir_ventana_secundaria():
         "val3": 0,
         "val4": 0,
         "val5": 0,
+        "val6": "",
     }
 
     # Variables para los valores numéricos
@@ -119,6 +121,12 @@ def abrir_ventana_secundaria():
     valor5_entry.insert(0, valores["val5"])
     valor5_entry.grid(row=4, column=1, padx=10, pady=5)
     
+    valor6_label = tk.Label(ventana_secundaria, text="Carpeta salida:")
+    valor6_label.grid(row=5, column=0, padx=10, pady=5)
+    valor6_entry = tk.Entry(ventana_secundaria)
+    valor6_entry.insert(0, valores["val6"])
+    valor6_entry.grid(row=5, column=1, padx=10, pady=5)
+    
     # Función para restaurar valores predeterminados en la ventana secundaria
     def restaurar_valores_predeterminados():
         # Valores predeterminados
@@ -128,6 +136,7 @@ def abrir_ventana_secundaria():
             "val3": 1550,
             "val4": 2048,
             "val5": 72,
+            "val6": "output",
         }
 
         # Restaurar los valores por defecto en los campos de texto
@@ -141,6 +150,8 @@ def abrir_ventana_secundaria():
         valor4_entry.insert(0, valores_por_defecto["val4"])
         valor5_entry.delete(0, tk.END)
         valor5_entry.insert(0, valores_por_defecto["val5"])
+        valor6_entry.delete(0, tk.END)
+        valor6_entry.insert(0, valores_por_defecto["val6"])
 
         # Actualizar el diccionario valores y guardarlos en el archivo JSON
         with open(r"resources\valores.json", "w") as archivo_json:
@@ -158,6 +169,7 @@ def abrir_ventana_secundaria():
             val3 = int(valor3_entry.get())
             val4 = int(valor4_entry.get())
             val5 = int(valor5_entry.get())
+            val6 = valor6_entry.get()
             
             # Guardar los valores en un diccionario
             valores["val1"] = val1
@@ -165,13 +177,14 @@ def abrir_ventana_secundaria():
             valores["val3"] = val3
             valores["val4"] = val4
             valores["val5"] = val5
+            valores["val6"] = val6
             
             # Guardar los valores en un archivo JSON
             with open(r"resources\valores.json", "w") as archivo_json:
                 json.dump(valores, archivo_json, indent=4)
 
             # Agregar mensaje de log o imprimir en consola (puedes cambiar esta función)
-            agregar_log(f"Valores guardados: \r\nTamaño logo: {val1} \r\nSeparación logo: {val2} \r\nTamaño fotografía: {val3} \r\nTamaño imagen final: {val4} \r\nPPP: {val5}")
+            agregar_log(f"Valores guardados: \r\nTamaño logo: {val1} \r\nSeparación logo: {val2} \r\nTamaño fotografía: {val3} \r\nTamaño imagen final: {val4} \r\nPPP: {val5}\r\nCarpeta salida: {val6}")
             
             # Cierra la ventana secundaria después de procesar
             ventana_secundaria.destroy()
@@ -181,11 +194,11 @@ def abrir_ventana_secundaria():
     
     # Botón para procesar los valores
     boton_procesar = tk.Button(ventana_secundaria, text="Aplicar", command=procesar_valores)
-    boton_procesar.grid(row=5, columnspan=2, padx=10, pady=10)
+    boton_procesar.grid(row=6, columnspan=2, padx=10, pady=10)
 
     # Botón para restaurar los valores predeterminados
     boton_restaurar = tk.Button(ventana_secundaria, text="Valores predeterminados", command=restaurar_valores_predeterminados)
-    boton_restaurar.grid(row=6, columnspan=2, padx=10, pady=10)
+    boton_restaurar.grid(row=7, columnspan=2, padx=10, pady=10)
 
 # Crear la ventana principal
 ventana = tk.Tk()
