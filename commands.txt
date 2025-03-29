@@ -1,0 +1,19 @@
+# Execution guide
+
+## Dependencies
+pip install Pillow pyinstaller
+
+## Create virtual environment
+python -m venv env
+
+## Install requirements for environment
+pip install -r requirements.txt
+
+## Activate venv
+env\Scripts\activate 
+
+## Generate .exe from script
+python -m PyInstaller --onefile --noconsole --icon=resources\be.ico --name=BlackEdger interfaz.py & xcopy /e /i resources dist\resources
+
+## Deactivate venv
+env\Scripts\deactivate
