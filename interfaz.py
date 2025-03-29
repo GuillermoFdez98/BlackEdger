@@ -189,7 +189,7 @@ def abrir_ventana_secundaria():
 
 # Crear la ventana principal
 ventana = tk.Tk()
-ventana.title("BlackEdging")
+ventana.title("BlackEdger")
 
 ventana.iconbitmap(r'resources\be.ico')
 
