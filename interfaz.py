@@ -42,14 +42,9 @@ def iniciar_proceso():
     agregar_log(f"Iniciando el proceso con la ruta: {ruta}")
     
     valores = leer_valores_json()
-    prev = False
     
-    # Si "Previsualizar" está marcado, ejecutar la función de previsualización
-    if var_previsualizar.get():
-        prev = True
-
     # Ejecutar la función principal en un hilo separado
-    thread = threading.Thread(target=main, args=(ruta, valores["val6"], valores, log_text, prev,))
+    thread = threading.Thread(target=main, args=(ruta, valores["val6"], valores, log_text, formato_variable_opcion, orientacion_variable_opcion,))
     thread.start()
 
 # Función de previsualización
@@ -103,7 +98,7 @@ def abrir_ventana_secundaria():
     valor2_entry.insert(0, valores["val2"])
     valor2_entry.grid(row=1, column=1, padx=10, pady=5)
 
-    valor3_label = tk.Label(ventana_secundaria, text="Tamaño fotografía:")
+    valor3_label = tk.Label(ventana_secundaria, text="Tamaño marco:")
     valor3_label.grid(row=2, column=0, padx=10, pady=5)
     valor3_entry = tk.Entry(ventana_secundaria)
     valor3_entry.insert(0, valores["val3"])
@@ -131,9 +126,9 @@ def abrir_ventana_secundaria():
     def restaurar_valores_predeterminados():
         # Valores predeterminados
         valores_por_defecto = {
-            "val1": 80,
-            "val2": 20,
-            "val3": 1550,
+            "val1": 50,
+            "val2": 5,
+            "val3": 75,
             "val4": 2048,
             "val5": 72,
             "val6": "output",
@@ -199,19 +194,44 @@ def abrir_ventana_secundaria():
     # Botón para restaurar los valores predeterminados
     boton_restaurar = tk.Button(ventana_secundaria, text="Valores predeterminados", command=restaurar_valores_predeterminados)
     boton_restaurar.grid(row=7, columnspan=2, padx=10, pady=10)
+    
+# Botón para abrir el explorador de archivos y seleccionar una ruta
+def seleccionar_ruta():
+    ruta = filedialog.askdirectory(title="Seleccionar ruta")
+    if ruta:
+        entry_ruta.delete(0, tk.END)
+        entry_ruta.insert(0, ruta)
 
 # Crear la ventana principal
 ventana = tk.Tk()
 ventana.title("BlackEdger")
+# ventana.geometry("800x600+100+50")
 
 ventana.iconbitmap(r'resources\be.ico')
 
 # Variable para el checkbox "Previsualizar"
 var_previsualizar = tk.IntVar()
+var_proporcional = tk.IntVar()
+
+# Variable que almacena la opción seleccionada
+formato_variable_opcion = tk.StringVar(ventana)
+orientacion_variable_opcion = tk.StringVar(ventana)
+
+# Lista de formato_op para el menú desplegable
+formato_op = ["Original", "1:1", "5:4"]
+orientacion_op = ["Horizontal", "Vertical"]
+
+# Establecer la opción por defecto (la primera opción)
+formato_variable_opcion.set(formato_op[0])
+orientacion_variable_opcion.set(orientacion_op[0])
 
 # Checkbox de previsualización
 checkbox_previsualizar = tk.Checkbutton(ventana, text="Previsualizar", variable=var_previsualizar)
-checkbox_previsualizar.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+# checkbox_previsualizar.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+
+# Checkbox de previsualización
+checkbox_proporcional = tk.Checkbutton(ventana, text="Porporcional", variable=var_proporcional)
+# checkbox_proporcional.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
 # Botón para abrir la ventana secundaria de valores numéricos
 boton_valores = tk.Button(ventana, text="Configuración", command=abrir_ventana_secundaria)
@@ -227,28 +247,29 @@ label_ruta.grid(row=1, column=0, padx=10, pady=5, sticky="w")
 
 # Campo de texto para la ruta
 entry_ruta = tk.Entry(ventana, width=40)
-entry_ruta.grid(row=1, column=1, padx=10, pady=5)
-
-# Botón para abrir el explorador de archivos y seleccionar una ruta
-def seleccionar_ruta():
-    ruta = filedialog.askdirectory(title="Seleccionar ruta")
-    if ruta:
-        entry_ruta.delete(0, tk.END)
-        entry_ruta.insert(0, ruta)
+entry_ruta.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 boton_explorar = tk.Button(ventana, text="Seleccionar carpeta", command=seleccionar_ruta)
-boton_explorar.grid(row=1, column=2, padx=10, pady=5)
+boton_explorar.grid(row=1, column=2, padx=10, pady=5, sticky="w")
+
+# Crear el menú de formato
+menu_formato = tk.OptionMenu(ventana, formato_variable_opcion, *formato_op)
+menu_formato.grid(row=2, column=0, padx=10, pady=5)
+
+# Crear el menú orientacion
+menu_orientacion = tk.OptionMenu(ventana, orientacion_variable_opcion, *orientacion_op)
+menu_orientacion.grid(row=2, column=1, padx=10, pady=5)
 
 # Botón para iniciar el proceso
 boton_iniciar = tk.Button(ventana, text="Iniciar Proceso", command=iniciar_proceso)
-boton_iniciar.grid(row=2, columnspan=3, padx=10, pady=10)
+boton_iniciar.grid(row=3, columnspan=3, padx=10, pady=10)
 
 # Área de log
 label_log = tk.Label(ventana, text="Log:")
-label_log.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+label_log.grid(row=4, column=0, padx=10, pady=5, sticky="w")
 
 log_text = tk.Text(ventana, width=50, height=10, wrap=tk.WORD)
-log_text.grid(row=3, column=1, columnspan=2, padx=10, pady=5)
+log_text.grid(row=4, column=1, columnspan=2, padx=10, pady=5)
 
 # Hacer que la ventana sea responsiva
 ventana.mainloop()

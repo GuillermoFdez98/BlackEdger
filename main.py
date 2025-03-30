@@ -26,7 +26,7 @@ def agregar_log(logger, mensaje):
     logger.yview(tk.END)  # Para hacer scroll al final del log
 
 
-def main(input_folder, output_folder, valores, logger, prev):
+def main(input_folder, output_folder, valores, logger, formato, orientacion):
     
     try:
         # Crear la carpeta 'output' si no existe
@@ -56,7 +56,7 @@ def main(input_folder, output_folder, valores, logger, prev):
                     # Abrir la imagen
                     imagen = Image.open(ruta_archivo).convert('RGBA')
                     
-                    final_image = process_photo(imagen, logo, valores, prev).convert('RGB')
+                    final_image = process_photo(imagen, logo, valores, formato, orientacion).convert('RGB')
                     
                     # Guardar la nueva imagen en la carpeta 'output'
                     final_image.save(os.path.join(output_dir, f"{archivo}"), dpi=(valores["val5"],valores["val5"]))
@@ -75,25 +75,36 @@ def main(input_folder, output_folder, valores, logger, prev):
     except Exception as e:
         agregar_log(logger, f"{e}")
 
-def process_photo(photo, logo, valores, prev):
+def process_photo(photo, logo, valores, formato, orientacion):
+        
+    bg_height = valores["val4"]
     
-    bg_width = int(valores["val4"] * 4 / 5)
+    if formato.get() == "Original":                
+        bg_width = int(photo.width * (valores["val4"] / photo.height))
+        
+        # Resize input photograph with large border
+        image = resize(photo, (bg_height - valores["val3"] * 2), (bg_width - valores["val3"] * 2))
+    else:
+        
+        [a, b] = formato.get().split(":")
+                        
+        if orientacion.get() == "Horizontal":
+            # Calculate background width from format
+            bg_width = int(valores["val4"] * int(a) / int(b))
+        else:
+            # Calculate background width from format
+            bg_width = int(valores["val4"] * int(b) / int(a))
+            
+        # Resize input photograph with large border
+        image = resize(photo, (bg_height - valores["val3"] * 2))
     
-    # Create white background with 1365 x 2048 px
-    background = Image.new('RGBA', (bg_width, valores["val4"]), BG_COLOR)
-    if prev:
-        cuadrado = Image.new('RGBA', (bg_width, bg_width), (0, 255, 255))
-    
-    # Resize input photograph with large border to 1275 px
-    image = resize(photo, valores["val3"])
+    # Create white background with
+    background = Image.new('RGBA', (bg_width, bg_height), BG_COLOR)
     
     # Paste input resized photo in center of background
     pos_x = (background.width - image.width) // 2
     pos_y = (background.height - image.height) // 2
-    
-    if prev:
-        background.paste(cuadrado, (((background.width - cuadrado.width) // 2), ((background.height - cuadrado.height) // 2)))
-    
+        
     background.paste(image, (pos_x, pos_y))
     
     # Paste logo on previous photo
@@ -103,19 +114,25 @@ def process_photo(photo, logo, valores, prev):
     return background
    
    
-def resize(photo, long_border):
+def resize(photo, long_border, short_border=0):
     
     # Obtener el tamaño original
     ancho, alto = photo.size
-    # Determinar la nueva altura o anchura manteniendo la relación de aspecto
-    if ancho > alto:
-        factor = long_border / ancho
-        nuevo_ancho = long_border
-        nuevo_alto = int(alto * factor)
+    
+    if short_border == 0:
+        # Determinar la nueva altura o anchura manteniendo la relación de aspecto
+        if ancho > alto:
+            factor = long_border / ancho
+            nuevo_ancho = long_border
+            nuevo_alto = int(alto * factor)
+        else:
+            factor = long_border / alto
+            nuevo_alto = long_border
+            nuevo_ancho = int(ancho * factor)
     else:
-        factor = long_border / alto
         nuevo_alto = long_border
-        nuevo_ancho = int(ancho * factor)
+        nuevo_ancho = short_border
+                
     # Redimensionar la imagen usando el nuevo método de resampling
     imagen_redimensionada = photo.resize((nuevo_ancho, nuevo_alto), Image.Resampling.LANCZOS)
     
