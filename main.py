@@ -1,5 +1,5 @@
 import os
-from PIL import Image
+from PIL import Image, ExifTags
 import tkinter as tk
 
 # Steps:
@@ -55,6 +55,19 @@ def main(input_folder, output_folder, valores, logger, formato, orientacion):
                 try:
                     # Abrir la imagen
                     imagen = Image.open(ruta_archivo).convert('RGBA')
+                    
+                    for etiqueta in ExifTags.TAGS:
+                        if ExifTags.TAGS[etiqueta] == 'Orientation':
+                            orientation_tag = etiqueta
+                            break
+                        
+                    orientation = imagen.getexif().get(orientation_tag, 1)
+                    if orientation == 3:
+                        imagen = imagen.rotate(180, expand=True)
+                    elif orientation == 6:
+                        imagen = imagen.rotate(270, expand=True)
+                    elif orientation == 8:
+                        imagen = imagen.rotate(90, expand=True)
                     
                     final_image = process_photo(imagen, logo, valores, formato, orientacion).convert('RGB')
                     
