@@ -107,9 +107,16 @@ def process_photo(photo, logo, valores, formato, orientacion):
         else:
             # Calculate background width from format
             bg_width = int(valores["val4"] * int(b) / int(a))
-            
-        # Resize input photograph with large border
-        image = resize(photo, (bg_height - valores["val3"] * 2))
+                    
+        # Landscape
+        if photo.width > photo.height:
+            # Resize input photograph with large border
+            image = resize(photo, (bg_width - valores["val3"] * 2))
+        
+        # Portrait
+        else:
+            # Resize input photograph with large border
+            image = resize(photo, (bg_height - valores["val3"] * 2))
     
     # Create white background with
     background = Image.new('RGBA', (bg_width, bg_height), BG_COLOR)
