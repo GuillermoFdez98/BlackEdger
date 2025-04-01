@@ -218,8 +218,8 @@ formato_variable_opcion = tk.StringVar(ventana)
 orientacion_variable_opcion = tk.StringVar(ventana)
 
 # Lista de formato_op para el menú desplegable
-formato_op = ["Original", "1:1", "5:4"]
-orientacion_op = ["Horizontal", "Vertical"]
+formato_op = ["4:3", "1:1", "5:4", "Original"]
+orientacion_op = ["Vertical", "Horizontal"]
 
 # Establecer la opción por defecto (la primera opción)
 formato_variable_opcion.set(formato_op[0])
