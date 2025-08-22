@@ -6,7 +6,7 @@ import os
 import threading
 import json
 
-VERSION = "v0.4.0"
+VERSION = "v0.6.0"
 output_folder_path = "output"
 
 valores = {
@@ -44,7 +44,7 @@ def iniciar_proceso():
     valores = leer_valores_json()
     
     # Ejecutar la función principal en un hilo separado
-    thread = threading.Thread(target=main, args=(ruta, valores["val6"], valores, log_text, formato_variable_opcion, orientacion_variable_opcion,))
+    thread = threading.Thread(target=main, args=(ruta, valores["val6"], valores, log_text, formato_variable_opcion, orientacion_variable_opcion,var_logo,))
     thread.start()
 
 # Función de previsualización
@@ -126,9 +126,9 @@ def abrir_ventana_secundaria():
     def restaurar_valores_predeterminados():
         # Valores predeterminados
         valores_por_defecto = {
-            "val1": 50,
-            "val2": 5,
-            "val3": 75,
+            "val1": 60,
+            "val2": 30,
+            "val3": 120,
             "val4": 2048,
             "val5": 72,
             "val6": "output",
@@ -211,14 +211,14 @@ ventana.iconbitmap(r'resources\be.ico')
 
 # Variable para el checkbox "Previsualizar"
 var_previsualizar = tk.IntVar()
-var_proporcional = tk.IntVar()
+var_logo = tk.IntVar(value=1)
 
 # Variable que almacena la opción seleccionada
 formato_variable_opcion = tk.StringVar(ventana)
 orientacion_variable_opcion = tk.StringVar(ventana)
 
 # Lista de formato_op para el menú desplegable
-formato_op = ["4:3", "1:1", "5:4", "Original"]
+formato_op = ["5:4", "1:1", "4:3", "Original"]
 orientacion_op = ["Vertical", "Horizontal"]
 
 # Establecer la opción por defecto (la primera opción)
@@ -228,10 +228,6 @@ orientacion_variable_opcion.set(orientacion_op[0])
 # Checkbox de previsualización
 checkbox_previsualizar = tk.Checkbutton(ventana, text="Previsualizar", variable=var_previsualizar)
 # checkbox_previsualizar.grid(row=2, column=1, padx=10, pady=5, sticky="w")
-
-# Checkbox de previsualización
-checkbox_proporcional = tk.Checkbutton(ventana, text="Porporcional", variable=var_proporcional)
-# checkbox_proporcional.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
 # Botón para abrir la ventana secundaria de valores numéricos
 boton_valores = tk.Button(ventana, text="Configuración", command=abrir_ventana_secundaria)
@@ -259,6 +255,10 @@ menu_formato.grid(row=2, column=0, padx=10, pady=5)
 # Crear el menú orientacion
 menu_orientacion = tk.OptionMenu(ventana, orientacion_variable_opcion, *orientacion_op)
 menu_orientacion.grid(row=2, column=1, padx=10, pady=5)
+
+# Checkbox de añadir logo o no
+checkbox_proporcional = tk.Checkbutton(ventana, text="Logo", variable=var_logo)
+checkbox_proporcional.grid(row=2, column=2, padx=10, pady=5, sticky="w")
 
 # Botón para iniciar el proceso
 boton_iniciar = tk.Button(ventana, text="Iniciar Proceso", command=iniciar_proceso)

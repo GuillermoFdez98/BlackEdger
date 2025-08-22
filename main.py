@@ -26,15 +26,18 @@ def agregar_log(logger, mensaje):
     logger.yview(tk.END)  # Para hacer scroll al final del log
 
 
-def main(input_folder, output_folder, valores, logger, formato, orientacion):
+def main(input_folder, output_folder, valores, logger, formato, orientacion, logo_flag):
     
     try:
+        # Add format to output folder name
+        output_folder = output_folder + "_" + formato.get().lower().replace(":", "_")
+        
         # Crear la carpeta 'output' si no existe
         output_dir = os.path.join(input_folder, output_folder)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        logo = resize(Image.open(LOGO_FOLDER_PATH), valores["val1"])
+        logo = resize(Image.open(LOGO_FOLDER_PATH), int(valores["val1"] * (Image.open(LOGO_FOLDER_PATH).size[0] / Image.open(LOGO_FOLDER_PATH).size[1])))
         
         if logo.mode != 'RGBA':
             logo = logo.convert('RGBA')
@@ -69,7 +72,7 @@ def main(input_folder, output_folder, valores, logger, formato, orientacion):
                     elif orientation == 8:
                         imagen = imagen.rotate(90, expand=True)
                     
-                    final_image = process_photo(imagen, logo, valores, formato, orientacion).convert('RGB')
+                    final_image = process_photo(imagen, logo, valores, formato, orientacion, logo_flag).convert('RGB')
                     
                     # Guardar la nueva imagen en la carpeta 'output'
                     final_image.save(os.path.join(output_dir, f"{archivo}"), dpi=(valores["val5"],valores["val5"]))
@@ -88,7 +91,7 @@ def main(input_folder, output_folder, valores, logger, formato, orientacion):
     except Exception as e:
         agregar_log(logger, f"{e}")
 
-def process_photo(photo, logo, valores, formato, orientacion):
+def process_photo(photo, logo, valores, formato, orientacion, logo_flag):
         
     bg_height = valores["val4"]
     
@@ -110,13 +113,18 @@ def process_photo(photo, logo, valores, formato, orientacion):
                     
         # Landscape
         if photo.width > photo.height:
-            # Resize input photograph with large border
+            # Resize input photograph with width
             image = resize(photo, (bg_width - valores["val3"] * 2))
-        
+
         # Portrait
-        else:
-            # Resize input photograph with large border
+        elif photo.width < photo.height:
+            # Resize input photograph with height
             image = resize(photo, (bg_height - valores["val3"] * 2))
+        
+        # Squared
+        else:
+            # Resize input photograph with width
+            image = resize(photo, (bg_width - valores["val3"] * 2))
     
     # Create white background with
     background = Image.new('RGBA', (bg_width, bg_height), BG_COLOR)
@@ -126,9 +134,10 @@ def process_photo(photo, logo, valores, formato, orientacion):
     pos_y = (background.height - image.height) // 2
         
     background.paste(image, (pos_x, pos_y))
-    
-    # Paste logo on previous photo
-    background.paste(logo, ((background.width - logo.width) // 2, background.height - valores["val1"] - valores["val2"]), logo.split()[3])
+        
+    # Paste logo on previous photo if selected
+    if logo_flag.get():
+        background.paste(logo, ((background.width - logo.width) // 2, background.height - valores["val1"] - valores["val2"]), logo.split()[3])
     
     # Return final output photo
     return background
